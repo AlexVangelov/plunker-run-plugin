@@ -15,6 +15,15 @@ var defaultCompileOptions = _.extend(Typescript.getDefaultCompilerOptions(), {
 module.exports = {
   matches: /\.ts$/,
   provides: ".js",
+  providesIndirect: function(pathname, files) {
+    var tsconfig = files['tsconfig.json'];
+    if (typeof tsconfig !== 'undefined') {
+      try {
+        tsconfig = JSON.parse(tsconfig);
+        return (tsconfig.compilerOptions && pathname === tsconfig.compilerOptions.out);
+      } catch (__) {}
+    }
+  },
   transform: function (context) {
     var options = _.defaults({}, context.compileOptions, defaultCompileOptions);
     

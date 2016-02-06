@@ -53,6 +53,7 @@ var transformers = _.map({
   jade: require('./transformers/jade'),
   stylus: require('./transformers/styl'),
   webtask: require('./transformers/webtask'),
+  //webpack: require('./transformers/webpack'),
 }, function (transformer, name) {
   transformer.name = name;
   return transformer;
@@ -190,6 +191,7 @@ Preview.render = function (request, reply) {
     // Start a competitive race between transformers to handle the request
     return Bluebird
       .map(transformers, function (transformer) {
+        var transformerProc;
         for (var sourcePath in preview.files) {
           var provides = typeof transformer.provides === 'function'
             ? transformer.provides(sourcePath)
@@ -200,9 +202,19 @@ Preview.render = function (request, reply) {
           if (produces === path) {
             var content = preview.files[sourcePath];
             
-            return [transformer, sourcePath, content];
+            transformerProc = [transformer, sourcePath, content];
+            break;
           }
         }
+        if (!transformerProc) { //try indirect provide (through config file)
+          if (typeof transformer.providesIndirect === 'function') {
+            if (transformer.providesIndirect(requestPath, preview.files)) {
+              console.log("* indirect provide for "+requestPath+" by "+transformer.name);
+              transformerProc = [transformer, requestPath, null];
+            }
+          }
+        }
+        return transformerProc;
       })
       .filter(Boolean)
       .any()
