@@ -20,7 +20,7 @@ module.exports = {
     if (typeof tsconfig !== 'undefined') {
       try {
         tsconfig = JSON.parse(tsconfig);
-        return (tsconfig.compilerOptions && pathname === tsconfig.compilerOptions.out);
+        return (tsconfig.compilerOptions && pathname === tsconfig.compilerOptions.outFile);
       } catch (__) {}
     }
   },
@@ -38,7 +38,7 @@ module.exports = {
     }
     
     context.preview.files[context.requestPath] = '';
-    
+
     var compilerHost = {
       getSourceFile: function (filename) {
         return Typescript.createSourceFile(filename, context.preview.files[filename], options.target);
@@ -52,8 +52,9 @@ module.exports = {
       getCurrentDirectory: _.constant(''),
       getNewLine: _.constant('\n'),
     };
-    
-    var program = Typescript.createProgram([context.sourcePath], options, compilerHost);
+
+    var sourcePaths = context.sourceContent ? [context.sourcePath] : options.files;
+    var program = Typescript.createProgram(sourcePaths, options, compilerHost);
     var result = program.emit();
     var diagnostics = Typescript.getPreEmitDiagnostics(program)
       .concat(result.diagnostics);

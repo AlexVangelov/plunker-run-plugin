@@ -53,7 +53,6 @@ var transformers = _.map({
   jade: require('./transformers/jade'),
   stylus: require('./transformers/styl'),
   webtask: require('./transformers/webtask'),
-  //webpack: require('./transformers/webpack'),
 }, function (transformer, name) {
   transformer.name = name;
   return transformer;
@@ -209,7 +208,6 @@ Preview.render = function (request, reply) {
         if (!transformerProc) { //try indirect provide (through config file)
           if (typeof transformer.providesIndirect === 'function') {
             if (transformer.providesIndirect(requestPath, preview.files)) {
-              console.log("* indirect provide for "+requestPath+" by "+transformer.name);
               transformerProc = [transformer, requestPath, null];
             }
           }
