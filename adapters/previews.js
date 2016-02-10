@@ -207,7 +207,7 @@ Preview.render = function (request, reply) {
         }
         if (!transformerProc) { //try indirect provide (through config file)
           if (typeof transformer.providesIndirect === 'function') {
-            if (transformer.providesIndirect(requestPath, preview.files)) {
+            if (transformer.providesIndirect(requestPath, preview)) {
               transformerProc = [transformer, requestPath, null];
             }
           }

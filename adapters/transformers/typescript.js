@@ -11,30 +11,39 @@ var defaultCompileOptions = _.extend(Typescript.getDefaultCompilerOptions(), {
   target: Typescript.ScriptTarget.ES3,
 });
 
+function getConfig(preview) {
+  var tsconfig = preview.files['tsconfig.json'];
+  if (typeof tsconfig !== 'undefined') {
+    try {
+      tsconfig = JSON.parse(tsconfig);
+      return (tsconfig.compilerOptions && pathname === tsconfig.compilerOptions.outFile);
+    } catch (err) {
+      preview.log({
+        source: 'Typescript configuration error',
+        data: err.message
+      });
+      throw new Boom.badRequest('tsconfig.json error: ' + err.message, err);
+    }
+  }
+}
 
 module.exports = {
   matches: /\.ts$/,
   provides: ".js",
-  providesIndirect: function(pathname, files) {
-    var tsconfig = files['tsconfig.json'];
+  providesIndirect: function(pathname, preview) {
+    var tsconfig = getConfig(preview);
+
     if (typeof tsconfig !== 'undefined') {
-      try {
-        tsconfig = JSON.parse(tsconfig);
-        return (tsconfig.compilerOptions && pathname === tsconfig.compilerOptions.outFile);
-      } catch (__) {}
+      return (tsconfig.compilerOptions && pathname === tsconfig.compilerOptions.outFile);
     }
   },
   transform: function (context) {
     var options = _.defaults({}, context.compileOptions, defaultCompileOptions);
     
-    var tsconfig = context.preview.files['tsconfig.json'];
+    var tsconfig = getConfig(context.preview);
     
     if (typeof tsconfig !== 'undefined') {
-      try {
-        tsconfig = JSON.parse(tsconfig);
-        
-        _.extend(options, tsconfig.compilerOptions);
-      } catch (__) {}
+      _.extend(options, tsconfig.compilerOptions);
     }
     
     context.preview.files[context.requestPath] = '';
