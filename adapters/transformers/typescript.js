@@ -16,7 +16,7 @@ function getConfig(preview) {
   if (typeof tsconfig !== 'undefined') {
     try {
       tsconfig = JSON.parse(tsconfig);
-      return (tsconfig.compilerOptions && pathname === tsconfig.compilerOptions.outFile);
+      return tsconfig.compilerOptions;
     } catch (err) {
       preview.log({
         source: 'Typescript configuration error',
