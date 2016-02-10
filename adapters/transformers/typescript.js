@@ -15,8 +15,7 @@ function getConfig(preview) {
   var tsconfig = preview.files['tsconfig.json'];
   if (typeof tsconfig !== 'undefined') {
     try {
-      tsconfig = JSON.parse(tsconfig);
-      return tsconfig.compilerOptions;
+      return JSON.parse(tsconfig);
     } catch (err) {
       preview.log({
         source: 'Typescript configuration error',
@@ -86,7 +85,7 @@ module.exports = {
           msg.line = coords.line;
           msg.position = coords.character;
         }
-        
+        console.log(msg);
         context.preview.log(msg);
       });
     }
