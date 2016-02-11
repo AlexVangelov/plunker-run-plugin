@@ -1,6 +1,7 @@
 var Boom = require('boom');
 var Typescript = require('typescript');
 var _ = require('lodash');
+var fs = require('fs');
 
 var defaultCompileOptions = _.extend(Typescript.getDefaultCompilerOptions(), {
   allowNonTsExtensions: true,
@@ -44,17 +45,23 @@ module.exports = {
     if (typeof tsconfig !== 'undefined') {
       _.extend(options, tsconfig.compilerOptions);
     }
-    
+
     context.preview.files[context.requestPath] = '';
 
     var compilerHost = {
       getSourceFile: function (filename) {
-        return Typescript.createSourceFile(filename, context.preview.files[filename], options.target);
+        var fileContent = context.preview.files[filename];
+        if (!fileContent && Typescript.getDefaultLibFilePath(options) === filename) {
+          fileContent = fs.readFileSync(filename, 'utf8');
+        }
+        return Typescript.createSourceFile(filename, fileContent, options.target);
       },
       writeFile: function (filename, text) {
         context.preview.files[context.requestPath] += text;
       },
-      getDefaultLibFileName: _.constant('lib.d.ts'),
+      getDefaultLibFileName: function(options) {
+        return Typescript.getDefaultLibFilePath(options);
+      },
       useCaseSensitiveFileNames: _.constant(false),
       getCanonicalFileName: _.identity,
       getCurrentDirectory: _.constant(''),
@@ -85,7 +92,6 @@ module.exports = {
           msg.line = coords.line;
           msg.position = coords.character;
         }
-        console.log(msg);
         context.preview.log(msg);
       });
     }
