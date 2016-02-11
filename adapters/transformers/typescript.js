@@ -68,7 +68,8 @@ module.exports = {
       getNewLine: _.constant('\n'),
     };
 
-    var sourcePaths = context.sourceContent ? [context.sourcePath] : options.files;
+    var sourcePaths = context.sourceContent ? [context.sourcePath] : tsconfig.files;
+
     var program = Typescript.createProgram(sourcePaths, options, compilerHost);
     var result = program.emit();
     var diagnostics = Typescript.getPreEmitDiagnostics(program)
@@ -92,10 +93,11 @@ module.exports = {
           msg.line = coords.line;
           msg.position = coords.character;
         }
+
         context.preview.log(msg);
       });
     }
-    
+
     if (!context.preview.files[context.requestPath]) {
       throw new Boom.badRequest('Compilation failed: ' + lastError, lastError);
     }
