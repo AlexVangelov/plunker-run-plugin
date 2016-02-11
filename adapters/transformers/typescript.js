@@ -41,6 +41,7 @@ module.exports = {
     var options = _.defaults({}, context.compileOptions, defaultCompileOptions);
     
     var tsconfig = getConfig(context.preview);
+    var defaultLibFilePath = Typescript.getDefaultLibFilePath({ target: options.target });
     
     if (typeof tsconfig !== 'undefined') {
       _.extend(options, tsconfig.compilerOptions);
@@ -51,7 +52,7 @@ module.exports = {
     var compilerHost = {
       getSourceFile: function (filename) {
         var fileContent = context.preview.files[filename];
-        if (!fileContent && Typescript.getDefaultLibFilePath(options) === filename) {
+        if (!fileContent && filename === defaultLibFilePath) {
           fileContent = fs.readFileSync(filename, 'utf8');
         }
         return Typescript.createSourceFile(filename, fileContent, options.target);
@@ -60,7 +61,7 @@ module.exports = {
         context.preview.files[context.requestPath] += text;
       },
       getDefaultLibFileName: function(options) {
-        return Typescript.getDefaultLibFilePath(options);
+        return defaultLibFilePath;
       },
       useCaseSensitiveFileNames: _.constant(false),
       getCanonicalFileName: _.identity,
