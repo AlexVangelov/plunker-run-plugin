@@ -29,7 +29,9 @@
     "traceur": "0.0.84",
     "typescript": "^1.6.2",
     "universal-analytics": "^0.3.8",
-    "wreck": "^5.6.1"
+    "wreck": "^5.6.1",
+    "webpack": "~1.12.13",
+    "memory-fs": "~0.3.0"
   },
   "devDependencies": {},
   "scripts": {

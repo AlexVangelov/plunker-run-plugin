@@ -53,6 +53,7 @@ var transformers = _.map({
   jade: require('./transformers/jade'),
   stylus: require('./transformers/styl'),
   webtask: require('./transformers/webtask'),
+  webpack: require('./transformers/webpack'),
 }, function (transformer, name) {
   transformer.name = name;
   return transformer;
